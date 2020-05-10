@@ -2,48 +2,55 @@ import React from "react";
 import "bootstrap";
 import TodoItems from "./components/TodoItems";
 import AddTodo from "./components/AddTodo";
+import { useState } from "react";
 
-class ToDoList extends React.Component {
-  state = {
-    items: [],
-  };
+export default function ToDoList() {
+  const [items, setItem] = useState([]);
 
-  addItem = (title) => {
+  const addItem = (title) => {
     var newItem;
     if (title) {
       newItem = {
         title,
         key: Date.now(),
+        isCompleted: false,
       };
     } else {
       return;
     }
 
-    this.setState({
-      items: [...this.state.items, newItem],
-    });
+    setItem([...items, newItem]);
   };
 
-  deleteItem = (key) => {
-    const filteredItems = this.state.items.filter((item) => {
+  const toggleComplete = (key) => {
+    const modItems = items.map((item) => {
+      if (item.key === key) {
+        item.isCompleted = !item.isCompleted;
+      }
+      return item;
+    });
+
+    setItem(modItems);
+  };
+
+  const deleteItem = (key) => {
+    const filteredItems = items.filter((item) => {
       return item.key !== key;
     });
-    this.setState({
-      items: filteredItems,
-    });
+    setItem(filteredItems);
   };
 
-  render() {
-    return (
-      <div className="container w-50 align-content-center">
-        <div className="bg-info my-2">
-          <h1 className="card-header"> My ToDo List</h1>
-          <AddTodo onSubmit={this.addItem} />
-        </div>
-        <TodoItems list={this.state.items} delete={this.deleteItem} />
+  return (
+    <div className="container w-50 align-content-center">
+      <div className="bg-info my-2">
+        <h1 className="card-header"> My ToDo List</h1>
+        <AddTodo onSubmit={addItem} />
       </div>
-    );
-  }
+      <TodoItems
+        list={items}
+        toggleComplete={toggleComplete}
+        delete={deleteItem}
+      />
+    </div>
+  );
 }
-
-export default ToDoList;
